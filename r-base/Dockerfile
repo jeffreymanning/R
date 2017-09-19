@@ -1,24 +1,40 @@
 FROM jeffreymanning/centos7-base
 
 MAINTAINER Jeff Manning
+LABEL name="r-base" \
+      vendor="MITRE Corp" \
+      version="3.4" \
+      release="0" \
+      summary="MITRE's base R image - 3.4.x" \
+      description="Centos7, R" \
+### Required labels above - recommended below
+      run='docker run -tdi --name ${NAME} ${IMAGE}' \
+      io.k8s.description="Centos, R base image" \
+      io.k8s.display-name="centos, R" \
+      io.openshift.expose-services="R" \
+      io.openshift.tags="centos7,R,java,maven"
 
 USER root
 
 #install the basic packages, must install sudo - some downstream consumers cannot run as root
 RUN yum clean all && \
     yum -y update && \
-    yum clean all
+    yum clean all -y && \
+    rm -rf /var/cache/yum
 
 ###  R lives in the epel-release, https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm or
-RUN yum install -y epel-release && yum clean all
+RUN yum install -y epel-release && \
+    yum clean all -y  && \
+    rm -rf /var/cache/yum
+
 # R-${R_BASE_VERSION} R-core-${R_BASE_VERSION} R-core-devel-${R_BASE_VERSION} R-devel-${R_BASE_VERSION} && \
 #R R-core R-core-devel R-devel R-Rcpp R-Rcpp-devel
 # # helpers for R package downloading: libcurl libcurl-devel openssl openssl-devel gnutls gnutls-devel
-RUN yum -y install \
-                   libicu libicu-devel blas blas-devel lapack lapack-devel libxml2 libxml2-devel texinfo texinfo-tex texlive-epsf \
+RUN INSTALL_PKGS="libicu libicu-devel blas blas-devel lapack lapack-devel libxml2 libxml2-devel texinfo texinfo-tex texlive-epsf \
                    libcurl libcurl-devel openssl openssl-devel gnutls gnutls-devel \
-                   R R-core R-core-devel R-devel && \
-                   yum clean all
+                   R R-core R-core-devel R-devel" && \
+    yum install -y --setopt=tsflags=nodocs ${INSTALL_PKGS} && \
+    yum clean all -y
 
 ## alternatively.. using centos
 # http://mirror.centos.org/centos/7/os/x86_64/Packages/<package>
@@ -46,7 +62,7 @@ RUN yum -y install \
 ## Set a default user. Available via runtime flag `--user docker`
 ## Add user to 'staff' group, granting them write privileges to /usr/local/lib/R/site.library
 ## User should also have & own a home directory (for rstudio or linked volumes to work properly).
-#RUN groupadd staff
+RUN groupadd staff
 #RUN useradd docker \
 #	&& chown docker:docker /home/docker \
 #    && usermod -aG staff docker
@@ -90,6 +106,12 @@ RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages
 #RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages(pkgs=c('httr'), Sys.getenv('R_LIBS_USER'), repos='${CRAN_REPO}')"
 #RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages(pkgs=c('devtools'), Sys.getenv('R_LIBS_USER'), repos='${CRAN_REPO}')"
 
+# get off root, move to default
+USER 10001
+
 #### Define default command.
-CMD ["R"]
+# R causes backoff loop failures - default to centos7-base
+#CMD ["R"]
+
+
 

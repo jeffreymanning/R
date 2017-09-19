@@ -1,6 +1,16 @@
 FROM jeffreymanning/sparkr-base
 
-MAINTAINER Jeff Manning
+LABEL maintainer="JWM" \
+      vendor="MITRE Corp" \
+      version="1.0" \
+      release="153" \
+      summary="MITRE's base RStudio, Spark-R image - 1.0.53/3.4.x/2.1.1 API node" \
+      description="Centos7, RStudio, Spark, R typically used for API nodes" \
+### Required labels above - recommended below
+      io.k8s.description="Centos, RStudio, Spark-R base API node image" \
+      io.k8s.display-name="centos, RStudio, Spark-R API node image" \
+      io.openshift.expose-services="RSTUDIO" \
+      io.openshift.tags="centos7,RStudio,Spark,R,java,maven"
 
 USER root
 
@@ -8,12 +18,12 @@ USER root
 RUN yum clean all && \
     rm -rf /var/cache/yum && \
     yum -y update && \
-    yum clean all
+    yum clean all -y
 
 # https://unix.stackexchange.com/questions/9314/no-such-file-or-directory-etc-init-d-functions
 # see comment #5 and follow links (https://github.com/knirbhay/scrapy-cluster/commit/19a15764ee566ebc84c49e2d958804cfd093d556#diff-1f04c545f788e34c88db8b137b973571R17)
 RUN yum -y install psmisc initscripts && \
-    yum clean all
+    yum clean all -y
 
 ARG R_STUDIO_MAJOR_VERSION=1
 ARG R_STUDIO_UPDATE_VERSION=0
@@ -34,7 +44,9 @@ WORKDIR ${R_STUDIO_INSTALL_DIR}
 #### ---- (Deployment mode use) (Download from Internet -- Deployment) ----
 RUN wget -c ${R_STUDIO_DOWNLOAD_URL}/${R_STUDIO_PKG_NAME}.rpm \
     && yum --nogpgcheck -y install ${R_STUDIO_PKG_NAME}.rpm \
-    && rm -f ${R_STUDIO_PKG_NAME}.rpm
+    && rm -f ${R_STUDIO_PKG_NAME}.rpm \
+    && yum clean all -y
+
 
 ### configure r-studio
 #RUN echo '\n\
@@ -58,7 +70,8 @@ RUN wget -c ${R_STUDIO_DOWNLOAD_URL}/${R_STUDIO_PKG_NAME}.rpm \
 RUN useradd rstudio \
     && echo "rstudio:rstudio" | chpasswd \
 	&& chown rstudio:rstudio /home/rstudio \
-    && usermod -aG staff rstudio
+    && usermod -aG staff rstudio \
+    && usermod -aG 0 rstudio
 
 #ENV PATH=/usr/lib/rstudio-server/bin:$PATH
 
@@ -67,11 +80,12 @@ COPY userconf.sh /etc/cont-init.d/userconf
 
 ## running with "-e ADD=shiny" adds shiny server
 #COPY add_shiny.sh /etc/cont-init.d/add
-
-#EXPOSE 8787
-#### Define default command.
-#CMD ["R"]
-
 EXPOSE 8787
+
+# get off of root..
+#
+# No rp-studio want to run from root???/
+#USER rstudio
+
 CMD /usr/lib/rstudio-server/bin/rserver --server-daemonize 0
 
