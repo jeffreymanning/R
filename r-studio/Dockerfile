@@ -84,7 +84,7 @@ EXPOSE 8787
 
 # get off of root..
 #
-# No rp-studio want to run from root???/
+# No r-studio wants to run from root???/
 #USER rstudio
 
 CMD /usr/lib/rstudio-server/bin/rserver --server-daemonize 0

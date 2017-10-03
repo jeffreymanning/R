@@ -1,10 +1,10 @@
 kind: Template
 apiVersion: v1
-template: centos7-test
+template: rbase-test
 metadata:
-  name: centos7-test
+  name: rbase-test
 labels:
-  app: centos7-test
+  app: rbase-test
 objects:
 
 - kind: DeploymentConfig

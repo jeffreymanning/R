@@ -15,7 +15,7 @@ LABEL maintainer="JWM" \
 
 USER root
 
-#install the basic packages, must install sudo - some downstream consumers cannot run as root
+#install the basic packages, must install sudo - some downstream cf6c240acc517onsumers cannot run as root
 RUN yum clean all && \
     yum -y update && \
     yum clean all -y && \
@@ -102,7 +102,7 @@ RUN echo "R_LIBS=\${R_LIBS-'/usr/local/lib/R/site-library:/usr/local/lib/R/libra
 #RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages(pkgs=c('devtools'), Sys.getenv('R_LIBS_USER'), repos='${CRAN_REPO}')"
 
 # get off root, move to default
-USER 10001
+USER default
 
 #### Define default command.
 # R causes backoff loop failures - default to centos7-base

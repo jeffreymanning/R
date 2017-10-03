@@ -92,6 +92,7 @@ RUN echo "R_LIBS=\${R_LIBS-'/usr/local/lib/R/site-library:/usr/local/lib/R/libra
 # miniml [packages required to build R interpreter
 RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages(pkgs=c('evaluate'), Sys.getenv('R_LIBS_USER'), repos='${CRAN_REPO}')"
 
+## the remaining packages are installed through R code
 ## install littler...  helps with scripting/installing
 #RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages(pkgs=c('littler'), Sys.getenv('R_LIBS_USER'), repos='${CRAN_REPO}')"
 #
@@ -107,8 +108,8 @@ RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages
 #RUN /usr/bin/Rscript --slave --no-save --no-restore-history -e "install.packages(pkgs=c('devtools'), Sys.getenv('R_LIBS_USER'), repos='${CRAN_REPO}')"
 
 # get off root, move to default
-USER 10001
-
+USER default
+CMD R
 #### Define default command.
 # R causes backoff loop failures - default to centos7-base
 #CMD ["R"]

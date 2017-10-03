@@ -1,10 +1,10 @@
 kind: Template
 apiVersion: v1
-template: sparkr-test
+template: rstudio-test
 metadata:
-  name: sparkr-test
+  name: rstudio-test
 labels:
-  app: sparkr-test
+  app: rstudio-test
 objects:
 
 - kind: DeploymentConfig
@@ -45,4 +45,4 @@ parameters:
   required: true
 - name: API_IMAGE
   description: Name of the API image (submit or shell)
-  value: docker.io/jeffreymanning/sparkr-base:latest
+  value: docker.io/jeffreymanning/r-studio:latest
