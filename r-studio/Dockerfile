@@ -70,8 +70,8 @@ RUN wget -c ${R_STUDIO_DOWNLOAD_URL}/${R_STUDIO_PKG_NAME}.rpm \
 RUN useradd rstudio \
     && echo "rstudio:rstudio" | chpasswd \
 	&& chown rstudio:rstudio /home/rstudio \
-    && usermod -aG staff rstudio \
-    && usermod -aG 0 rstudio
+    && usermod -aG default rstudio \
+    && usermod -aG root rstudio
 
 #ENV PATH=/usr/lib/rstudio-server/bin:$PATH
 
