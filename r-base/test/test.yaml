@@ -7,6 +7,22 @@ labels:
   app: rbase-test
 objects:
 
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: ${RSTUDIO_NAME}
+    labels:
+      name: ${RSTUDIO_NAME}
+      cluster: ${CLUSTER_NAME}
+      type: api
+  spec:
+    ports:
+      - protocol: TCP
+        port: 8787
+        targetPort: 8787
+    selector:
+      name: ${RSTUDIO_NAME}
+
 - kind: DeploymentConfig
   apiVersion: v1
   metadata:
